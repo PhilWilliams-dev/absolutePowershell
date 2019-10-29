@@ -11,7 +11,7 @@ In a new powershell console execute Import-Module com.absolute.api to add the mo
 
 Create an authentication token by calling the Set-AbsoluteAuth function.
 
-Example:  $myAuth =  -apiToken "<Token>" -apiSecret "<Secret>"
+	Example:  $myAuth =  -apiToken "<Token>" -apiSecret "<Secret>"
 
 
 
