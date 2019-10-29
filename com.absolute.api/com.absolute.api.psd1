@@ -12,7 +12,7 @@
  RootModule = '.\com.absolute.api.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6'
+ModuleVersion = '1.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'Phil Williams'
 CompanyName = ''
 
 # Copyright statement for this module
-Copyright = 'GNU v3 License'
+Copyright = 'GNU GENERAL PUBLIC LICENSE v3'
 
 # Description of the functionality provided by this module
  Description = 'Provides access to the Absolute Platform API calls'
