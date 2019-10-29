@@ -24,10 +24,10 @@ GUID = '25a21608-7d1c-4860-aa1e-14881edc1138'
 Author = 'Phil Williams'
 
 # Company or vendor of this module
-CompanyName = 'Absolute Software'
+CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) 2019 Absolute Software. All rights reserved.'
+Copyright = 'GNU v3 License'
 
 # Description of the functionality provided by this module
  Description = 'Provides access to the Absolute Platform API calls'
