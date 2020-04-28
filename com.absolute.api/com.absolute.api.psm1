@@ -1,4 +1,4 @@
-﻿##Version 1.7
+﻿##Version 1.71
 
 
 # Authentication Functions
@@ -490,7 +490,7 @@ class CdfData{
 
                 else{
                     #Boring old Text fields get handled here
-                    $this.cdfValues += [CdfValue]::new($v.Uid, '', $CdfValue, $v.Name)
+                    $this.cdfValues += [CdfValue]::new($v.Uid, '', $CdfValue, $v.Name, $v.type)
                     return $true
 
                     }
