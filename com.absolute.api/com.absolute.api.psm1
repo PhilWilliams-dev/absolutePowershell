@@ -1,4 +1,4 @@
-﻿##Version 1.71
+﻿##Version 1.8
 
 
 # Authentication Functions
@@ -54,13 +54,23 @@ function UrlEncode($ToBeEncoded){
     $ToBeEncoded = $ToBeEncoded -replace "\(", "%28"
     $ToBeEncoded = $ToBeEncoded -replace "\)", "%29"
     $ToBeEncoded = $ToBeEncoded -replace ",", "%2C"
-
+    $ToBeEncoded = $ToBeEncoded -replace ":", "%3A"
+    
     return $ToBeEncoded
+}
+
+#Helper Functions
+function getUTCTimeStamp([dateTime] $when){
+
+    return [Math]::Floor((New-TimeSpan -Start (Get-Date "01/01/1970") -End ($when)).TotalMilliseconds)
+}
+
+function getDateFromUtcTimeStamp ([int64] $utcMilliseconds){
+    return [datetime](Get-Date "01/01/1970").AddMilliseconds($utcMilliseconds)
 }
 
 
 #Base Api Request
-
 function Make-request(){
     param(
             $authData,
@@ -113,7 +123,7 @@ function Make-request(){
     $header.Add("Content-Type",$ContentType)
     $header.Add("X-Abs-Date",$XAbsDate)
     $header.Add("Authorization",$Authorization)
-
+    
     # Make Request
 
     try{
@@ -126,8 +136,8 @@ function Make-request(){
         }
     
         if($body -eq ''){
-            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header
-        }
+            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -InformationVariable $info
+            }
         else{
             $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -Body $body
         }
@@ -137,15 +147,14 @@ function Make-request(){
     catch{
         if($_.Exception.Response.StatusCode.value__ -eq 400){return "Device ESN is probably wrong"}
         elseif($_.Exception.Response.StatusCode.value__ -eq 401) {return "API Authenication Failed, correct keys for this device?"}
-        else{ return "HTTP Status code: " + $_.Exception.Response.StatusCode.value__ }
+        elseif($_.Exception.Response.StatusCode.value__ -eq 500) {return "API service returned 500 error"}
+        else{ return $PSItem.Exception }
+        }
     }
-
-}
-
+    
 
 #Api requests
-
-function Get-ActiveDevices(){
+function Get-ActiveDevicesInt(){
     param(
         $authData,
         [String[]]$FieldList
@@ -240,7 +249,6 @@ function Get-DeviceUIDFromserial(){
 
 
 #request Body Generation
-
 function MakeFreezeBody(){
     Param(
         [String[]]$uidList,
@@ -306,7 +314,6 @@ function MakeUnenrollBody(){
 
 
 #classes
-
 class AbsoluteAuthData{
         [String] $apiToken = "";
         [String] $apiSecret = "";
@@ -550,6 +557,7 @@ class AccountCdfData{
 
 }
 
+
 #Exposed Actions
 function Invoke-FreezeDevice(){
     param(
@@ -720,6 +728,37 @@ function Get-Device(){
 
 }
 
+function Get-ActiveDevices(){
+     param(
+        [Parameter(Mandatory=$true)]$auth,
+        [String[]]$FieldList
+    )
+
+    if($auth.GetType().Name -ne "AbsoluteAuthData") {
+        Write-Host "Invalid Authentication object provided" 
+        return
+        }
+
+    try{
+        if($FieldList){
+            $response = Get-ActiveDevicesInt -authData $auth -FieldList $fieldList
+            return $response
+
+        }
+        else{
+             $response = Get-ActiveDevicesInt -authData $auth
+            return $response
+        }
+
+    }
+    catch{
+        if($_.Exception.Response.StatusCode.value__ -eq 400){ return "Bad Request, device unlicenced or maked as disabled / Stolen"}
+        elseif($_.Exception.Response.StatusCode.value__ -eq 401) {return "API Authenication Failed, correct keys for this device?"}
+        else{ return "HTTP Status code: " + $_.Exception.Response.StatusCode.value__ }
+        }
+
+}
+
 function Set-AbsoluteAuth(){
     param(
         [Parameter(Mandatory=$true)][String]$apiToken = $(Read-Host "Enter API Token: "),
@@ -847,4 +886,38 @@ function Set-DeviceCDF(){
         else{ return "HTTP Status code: " + $_.Exception.Response.StatusCode.value__ }
         }
 
+}
+
+function Convert-UnixDateTime{
+    [cmdletbinding()]
+    param(
+        [parameter(Mandatory=$true,ValueFromPipeline = $true)]$pipelineInput,
+        [Parameter(Mandatory=$true)][String[]]$FieldList
+        )
+    Process {
+
+        ForEach ($input in $pipelineInput){
+            
+            ForEach($field in $FieldList){
+                if($field.lastIndexOf(".") -lt 1){
+                    #Normal so just do the job
+                    if([bool]($input.PSobject.Properties.name -match $field)){
+                    $input.$field = getDateFromUtcTimeStamp $input.$field
+                    }
+                }
+                else{
+                    #This is an object 
+                    $lastDot = $field.lastIndexOf(".")
+                    $path = $field.Substring(0,($lastDot))
+                    $pram = $field.Substring($lastDot+1, ($field.Length - ($lastDot+1)))
+                
+                    if([bool]($input.$path.PSobject.Properties.name -match $pram)){
+                    $input.$path.$pram = getDateFromUtcTimeStamp $input.$path.$pram
+                    }
+
+                }
+            }
+        }
+        return $pipelineInput
+    }
 }
