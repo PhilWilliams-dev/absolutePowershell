@@ -106,3 +106,14 @@ Create an authentication token by calling the Set-AbsoluteAuth function.
 
 	#Save the changes back to the api
 	Set-DeviceCdf -auth <auth> -Cdfdata $myCdf
+
+
+**Convert-UnixDateTime** - Allows for pipeline conversion of Unix timestamp date/time to human readable
+
+	Parameters:
+	
+	-FieldList -List of field names to convert
+	
+	**Eample use of Convert-UnixDateTime**
+	
+	Get-ActiveDevices -auth $abtAuth | Convert-UnixDateTime -FieldList lastConnectedUtc
