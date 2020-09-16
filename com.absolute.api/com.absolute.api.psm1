@@ -1,4 +1,4 @@
-﻿##Version 1.8
+﻿##Version 1.8.1
 
 
 # Authentication Functions
@@ -598,7 +598,7 @@ function Invoke-FreezeDevice(){
         $uid = Get-DeviceUIDFromESN -authData $auth -esn $DeviceList
     }
 
-    $Body = MakeFreezeBody -uidList $uid -passcode $Passcode -message $Message -emailList $NotifiyeMails -messageName $MessageName -requestName $RequestName
+    $Body = MakeFreezeBody -uidList $uid -passcode $Passcode -message $Message -emailList $NotifyeMails -messageName $MessageName -requestName $RequestName
 
     try{
         $response = Make-request -authData $auth -path '/v2/device-freeze/requests' -method 'POST' -body $Body
