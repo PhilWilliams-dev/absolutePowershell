@@ -1,5 +1,8 @@
 ﻿##Version 1.8.1
 
+if ($PSVersionTable.PSVersion.Major -gt 5) {
+    $PSDefaultParameterValues['Invoke-RestMethod:SkipHeaderValidation'] = $true
+}
 
 # Authentication Functions
 function SHA256_Hash_Hex_Low_Encode(){
