@@ -1,5 +1,8 @@
 ﻿##Version 1.8.1
 
+if ($PSVersionTable.PSVersion.Major -gt 5) {
+    $PSDefaultParameterValues['Invoke-RestMethod:SkipHeaderValidation'] = $true
+}
 
 # Authentication Functions
 function SHA256_Hash_Hex_Low_Encode(){
@@ -120,7 +123,6 @@ function Make-request(){
     $Authorization = $Algorithm + ' Credential=' + $credential + ', SignedHeaders=host;content-type;x-abs-date, Signature=' + $signature
     $header = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $header.Add("host",$APIHost)
-    $header.Add("Content-Type",$ContentType)
     $header.Add("X-Abs-Date",$XAbsDate)
     $header.Add("Authorization",$Authorization)
     
@@ -136,10 +138,10 @@ function Make-request(){
         }
     
         if($body -eq ''){
-            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -InformationVariable $info
+            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -InformationVariable $info -ContentType 'application/json'
             }
         else{
-            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -Body $body
+            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -Body $body -ContentType 'application/json'
         }
 
         return $response
