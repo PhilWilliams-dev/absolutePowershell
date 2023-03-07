@@ -138,10 +138,10 @@ function Make-request(){
         }
     
         if($body -eq ''){
-            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -InformationVariable $info -ContentType 'application/json'
+            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -InformationVariable $info -ContentType $ContentType
             }
         else{
-            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -Body $body -ContentType 'application/json'
+            $response = Invoke-RestMethod -Uri $url -Method $method -Header $header -Body $body -ContentType $ContentType
         }
 
         return $response
