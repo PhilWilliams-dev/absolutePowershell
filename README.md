@@ -1,3 +1,6 @@
+# I no longer maintain this project, however you can find updated releases here:-  https://github.com/raijutech/absolutePowershell
+
+
 # absolutePowershell
 
 **Installation**
